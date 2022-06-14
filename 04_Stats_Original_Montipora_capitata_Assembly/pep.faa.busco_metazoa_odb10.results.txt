@@ -1,0 +1,6 @@
+Complete	897	94.0%
+Single-copy	723	75.8%
+Duplicated	174	18.2%
+Fragmented	33	3.5%
+Missing	24	2.5%
+Total	954	100%

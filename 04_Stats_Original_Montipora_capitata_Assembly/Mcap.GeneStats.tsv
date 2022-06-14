@@ -1,0 +1,43 @@
+# Files
+Genome file	Mcap.genome_assembly.fa
+GFF file	Mcap.genes.cleaned.gff3
+
+# Genome stats
+Total scaffold length (bp)	885704498
+Total contig length (bp)	885704498
+Number of scaffolds	3043
+Number of contigs	3043
+N50 of scaffolds (bp)	540623
+N50 of contigs (bp)	540623
+Percent gaps	0.000
+Percent GC	39.63
+
+# Gene stats (combined CDS+introns)
+Number of genes	63227
+Total gene length	410196486
+Average gene length (bp)	6487.68
+Gene percent GC	39.85
+
+# Transcript stats (based on CDS features)
+Average transcript length (bp)	1161.91
+Average number of CDS per gene/transcript	4.49058
+
+# CDS stats
+Number of CDS	283926
+Total CDS length (bp)	73464001
+Average CDS length (bp)	258.743
+Number of single-CDS transcripts	22344
+Percent single-CDS transcripts	35.3393
+CDS percent GC	43.99
+
+# Intron stats (predicted between CDS features)
+Number of introns	220699
+Total intron length (bp)	336732485
+Average intron length (bp)	1525.75
+Intron percent GC	38.95
+
+# Intergenic stats (predicted between genes built from CDS features)
+Number of intergenic regions	60235
+Total intergenic region length (bp)	425241142
+Average intergenic region length (bp)	7059.7
+Intergenic region percent GC	39.45

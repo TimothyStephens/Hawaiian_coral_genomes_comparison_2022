@@ -1,0 +1,6 @@
+BUSCO_categories	Montipora_cactus_SLJPv2	Montipora_capitata_KBHIv3	Montipora_capitata_WTHIv1.1	Montipora_efflorescens_SLJPv2	Montipora_sp1_aff_capitata_ULFMv1	Pocillopora_acuta_KBHIv2	Pocillopora_acuta_LBIDv1	Pocillopora_damicornis_SIPAv1	Pocillopora_meandrina_KBHIv1	Pocillopora_verrucosa_RSSAv1	Porites_astreoides_BBBMv1	Porites_australiensis_SLJPv1	Porites_compressa_KBHIv1	Porites_lutea_OIAUv1.1	Porites_rus_NAIDv1	Montipora_capitata_KBHIv1	Montipora_capitata_KBHIv3_Chromosomes	Montipora_capitata_KBHIv3_ExtraChromosomal
+Complete	92.2	99.2	85.5	91.8	82.7	98.5	91.4	91.4	98.8	98.0	98.0	94.9	99.2	98.5	67.1	97.7	98.4	2.8
+Single-copy	92.2	98.0	85.1	91.0	82.7	96.5	90.6	91.4	98.4	92.5	83.1	92.5	98.0	96.9	65.9	75.7	97.6	2.4
+Duplicated	0.0	1.2	0.4	0.8	0.0	2.0	0.8	0.0	0.4	5.5	14.9	2.4	1.2	1.6	1.2	22.0	0.8	0.4
+Fragmented	5.9	0.0	10.6	4.3	14.9	0.8	4.3	5.5	0.4	1.2	0.8	3.5	0.4	0.4	22.7	0.8	0.4	2.0
+Missing	1.9	0.8	3.9	3.9	2.4	0.7	4.3	3.1	0.8	0.8	1.2	1.6	0.4	1.1	10.2	1.5	1.2	95.2

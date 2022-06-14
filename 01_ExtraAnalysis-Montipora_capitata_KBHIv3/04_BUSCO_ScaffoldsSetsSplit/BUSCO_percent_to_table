@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+echo -e "BUSCO_categories\nComplete\nSingle-copy\nDuplicated\nFragmented\nMissing" > busco.tmp1
+for F in $@; 
+do 
+  HEADER=$(echo $F | sed -e 's@.*/\([^/]*\)/04_BUSCO.*@\1@')
+  awk -F'\t' -v HEADER="${HEADER}" 'BEGIN{print "BUSCO_categories\t"HEADER} {print $1"\t"$3}' $F | sed -e 's/%//' > busco.tmp2
+  join -t $'\t' busco.tmp1 busco.tmp2 > busco.tmp3
+  #head -n 100 busco.tmp*
+  mv busco.tmp3 busco.tmp1
+done
+cat busco.tmp1
+rm busco.tmp*

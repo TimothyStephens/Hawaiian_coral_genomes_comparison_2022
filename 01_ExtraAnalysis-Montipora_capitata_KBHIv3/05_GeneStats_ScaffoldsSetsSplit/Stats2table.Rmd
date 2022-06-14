@@ -1,0 +1,300 @@
+---
+title: "Plot QC results for each genome"
+author: "Timothy Stephens"
+date: "02/05/2022"
+output: 
+  html_document:
+    keep_md: yes
+---
+
+
+
+# Setup
+
+Setup R env. Load packages and set default image export formats, size and resolution.
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.height = 8, 
+                      fig.width = 12, 
+                      dev = c("png", "pdf"),
+                      dpi = 1000)
+library(readxl)
+library(dplyr)
+library(tibble)
+library(ggplot2)
+library(reshape2)
+library(scales)
+library(ggdendro)
+library(cowplot)
+library(RColorBrewer)
+library(phylogram)
+library(gridExtra)
+library(ggrepel)
+library(writexl)
+library(stringr)
+options(scipen = 999) #Prevent scientific notation
+```
+
+
+## Color palets
+
+Color palet for BUSCO gene categories.
+
+```{r color_palets}
+my_colors <- c("#56B4E9", "#3492C7", "#F0E442", "#F04442")
+```
+
+
+
+
+
+# Format Gene Stats info
+
+```{bash combine-01_stats-results}
+i=1
+for F in ../../../../../../0031_Coral_genomes/04_Results/2022-02-03/Montipora_*/01_stats/*.GeneStats.tsv \
+         ../../../../../../0031_Coral_genomes/04_Results/2022-02-03/Pocillopora_*/01_stats/*.GeneStats.tsv \
+         ../../../../../../0031_Coral_genomes/04_Results/2022-02-03/Porites_*/01_stats/*.GeneStats.tsv \
+         Montipora_capitata_KBHIv3.chromosomes.GeneStats.tsv \
+         Montipora_capitata_KBHIv3.extrachromosomal.GeneStats.tsv;
+do 
+  filelist[i]="$F"
+  i=$i+1
+done
+
+awk -F'\t' 'BEGIN {L="SampleID"} {L=L"\t"$1} END {print L} ' "${filelist[1]}" > all_genomes-01_stats-results.tsv
+for F in "${filelist[@]}";
+do
+  awk -F'\t' 'BEGIN {L=""} { if(NR==1) {X=$2; gsub(".assembly.fasta", "", $2); L=L"\t"$2"\t"X} else {L=L"\t"$2}} END {print L} ' "${F}" | cut -f2- >> all_genomes-01_stats-results.tsv
+done
+```
+
+
+
+
+
+# Format BUSCO info
+
+Combine BUSCO gene count and percent into a single cell and format for inport into R.
+
+```{bash combine-02_busco-results4table}
+i=1
+for F in ../../../../../../0031_Coral_genomes/04_Results/2022-02-03/Montipora_*/02_busco \
+         ../../../../../../0031_Coral_genomes/04_Results/2022-02-03/Pocillopora_*/02_busco \
+         ../../../../../../0031_Coral_genomes/04_Results/2022-02-03/Porites_*/02_busco ;
+do 
+  filelist[i]="$F"
+  i=$i+1
+done
+
+## Genome - eukaryota_odb10
+awk -F'\t' 'BEGIN {L="SampleID"} {L=L"\t"$1} END {print L} ' "${filelist[1]}/genome.fa.busco_eukaryota_odb10.results.txt" \
+  > all_genomes-02_busco-Genome_eukaryota_odb10-results4table.tsv
+for F in "${filelist[@]}";
+do
+  P=$(echo "${F}" | awk -F'/' '{print $10}')
+  awk -F'\t' -v P="$P" 'BEGIN {L=P} {L=L"\t"$3" ("$2")"} END {print L} ' "${F}/genome.fa.busco_eukaryota_odb10.results.txt" \
+    >> all_genomes-02_busco-Genome_eukaryota_odb10-results4table.tsv
+done
+awk -F'\t' -v P="Montipora_capitata_KBHIv3.chromosomes" 'BEGIN {L=P} {L=L"\t"$3" ("$2")"} END {print L} ' \
+  ../04_BUSCO_ScaffoldsSetsSplit/genome.fa.busco_eukaryota_odb10.results.txt \
+    >> all_genomes-02_busco-Genome_eukaryota_odb10-results4table.tsv
+awk -F'\t' -v P="Montipora_capitata_KBHIv3.extrachromosomal" 'BEGIN {L=P} {L=L"\t"$3" ("$2")"} END {print L} ' \
+  ../04_BUSCO_ScaffoldsSetsSplit/genome_extra.fa.busco_eukaryota_odb10.results.txt \
+    >> all_genomes-02_busco-Genome_eukaryota_odb10-results4table.tsv
+
+
+## Genome - metazoa_odb10
+awk -F'\t' 'BEGIN {L="SampleID"} {L=L"\t"$1} END {print L} ' "${filelist[1]}/genome.fa.busco_metazoa_odb10.results.txt" \
+  > all_genomes-02_busco-Genome_metazoa_odb10-results4table.tsv
+for F in "${filelist[@]}";
+do
+  P=$(echo "${F}" | awk -F'/' '{print $10}')
+  awk -F'\t' -v P="$P" 'BEGIN {L=P} {L=L"\t"$3" ("$2")"} END {print L} ' "${F}/genome.fa.busco_metazoa_odb10.results.txt" \
+    >> all_genomes-02_busco-Genome_metazoa_odb10-results4table.tsv
+done
+awk -F'\t' -v P="Montipora_capitata_KBHIv3.chromosomes" 'BEGIN {L=P} {L=L"\t"$3" ("$2")"} END {print L} ' \
+  ../04_BUSCO_ScaffoldsSetsSplit/genome.fa.busco_metazoa_odb10.results.txt \
+    >> all_genomes-02_busco-Genome_metazoa_odb10-results4table.tsv
+awk -F'\t' -v P="Montipora_capitata_KBHIv3.extrachromosomal" 'BEGIN {L=P} {L=L"\t"$3" ("$2")"} END {print L} ' \
+  ../04_BUSCO_ScaffoldsSetsSplit/genome_extra.fa.busco_metazoa_odb10.results.txt \
+    >> all_genomes-02_busco-Genome_metazoa_odb10-results4table.tsv
+
+## Protein - eukaryota_odb10
+awk -F'\t' 'BEGIN {L="SampleID"} {L=L"\t"$1} END {print L} ' "${filelist[1]}/pep.faa.busco_eukaryota_odb10.results.txt" \
+  > all_genomes-02_busco-Protein_eukaryota_odb10-results4table.tsv
+for F in "${filelist[@]}";
+do
+  P=$(echo "${F}" | awk -F'/' '{print $10}')
+  awk -F'\t' -v P="$P" 'BEGIN {L=P} {L=L"\t"$3" ("$2")"} END {print L} ' "${F}/pep.faa.busco_eukaryota_odb10.results.txt" \
+    >> all_genomes-02_busco-Protein_eukaryota_odb10-results4table.tsv
+done
+awk -F'\t' -v P="Montipora_capitata_KBHIv3.chromosomes" 'BEGIN {L=P} {L=L"\t"$3" ("$2")"} END {print L} ' \
+  ../04_BUSCO_ScaffoldsSetsSplit/pep.faa.busco_eukaryota_odb10.results.txt \
+    >> all_genomes-02_busco-Protein_eukaryota_odb10-results4table.tsv
+awk -F'\t' -v P="Montipora_capitata_KBHIv3.extrachromosomal" 'BEGIN {L=P} {L=L"\t"$3" ("$2")"} END {print L} ' \
+  ../04_BUSCO_ScaffoldsSetsSplit/pep_extra.faa.busco_eukaryota_odb10.results.txt \
+    >> all_genomes-02_busco-Protein_eukaryota_odb10-results4table.tsv
+
+## Protein - metazoa_odb10
+awk -F'\t' 'BEGIN {L="SampleID"} {L=L"\t"$1} END {print L} ' "${filelist[1]}/pep.faa.busco_metazoa_odb10.results.txt" \
+  > all_genomes-02_busco-Protein_metazoa_odb10-results4table.tsv
+for F in "${filelist[@]}";
+do
+  P=$(echo "${F}" | awk -F'/' '{print $10}')
+  awk -F'\t' -v P="$P" 'BEGIN {L=P} {L=L"\t"$3" ("$2")"} END {print L} ' "${F}/pep.faa.busco_metazoa_odb10.results.txt" \
+    >> all_genomes-02_busco-Protein_metazoa_odb10-results4table.tsv
+done
+awk -F'\t' -v P="Montipora_capitata_KBHIv3.chromosomes" 'BEGIN {L=P} {L=L"\t"$3" ("$2")"} END {print L} ' \
+  ../04_BUSCO_ScaffoldsSetsSplit/pep.faa.busco_metazoa_odb10.results.txt \
+    >> all_genomes-02_busco-Protein_metazoa_odb10-results4table.tsv
+awk -F'\t' -v P="Montipora_capitata_KBHIv3.extrachromosomal" 'BEGIN {L=P} {L=L"\t"$3" ("$2")"} END {print L} ' \
+  ../04_BUSCO_ScaffoldsSetsSplit/pep_extra.faa.busco_metazoa_odb10.results.txt \
+    >> all_genomes-02_busco-Protein_metazoa_odb10-results4table.tsv
+```
+
+
+
+
+
+# Load data
+
+```{r load_data}
+genome.stats <- read.table("all_genomes-01_stats-results.tsv", sep='\t', header=TRUE, check.names=FALSE, stringsAsFactors=FALSE)
+genome.eukaryota <- read.table("all_genomes-02_busco-Genome_eukaryota_odb10-results4table.tsv", sep='\t', header=TRUE, check.names=FALSE)
+genome.metazoa <- read.table("all_genomes-02_busco-Genome_metazoa_odb10-results4table.tsv", sep='\t', header=TRUE, check.names=FALSE)
+protein.eukaryota <- read.table("all_genomes-02_busco-Protein_eukaryota_odb10-results4table.tsv", sep='\t', header=TRUE, check.names=FALSE)
+protein.metazoa <- read.table("all_genomes-02_busco-Protein_metazoa_odb10-results4table.tsv", sep='\t', header=TRUE, check.names=FALSE)
+```
+
+
+
+
+
+# Make combined table
+
+Extract just the columns (in a logical order) from each datasets to output into an excel sheet for publication. 
+Add extra empty columns which will separate the data from different sections (saves having to add this formatting later by hand). 
+Also add "XX--" prefix to BUSCO columns names to make then unique when joining the tables. Will remove later.
+
+```{r combined_table}
+t1 <- genome.stats %>%
+  filter(SampleID!="Pocillopora_meandrina_KBHIv1") %>%
+  select("SampleID", 
+         "Total scaffold length (bp)", 
+         "Total contig length (bp)",
+         "Number of scaffolds",
+         "Number of contigs",
+         "N50 of scaffolds (bp)",
+         "N50 of contigs (bp)",
+         "Percent gaps") %>%
+  mutate("Genome assembly"="") %>%
+  relocate(last_col(), .before = "Total scaffold length (bp)") %>%
+  mutate(across(c("Total scaffold length (bp)", 
+                  "Total contig length (bp)",
+                  "Number of scaffolds",
+                  "Number of contigs",
+                  "N50 of scaffolds (bp)",
+                  "N50 of contigs (bp)"), comma))
+
+t2 <- genome.metazoa %>%
+  filter(SampleID!="Pocillopora_meandrina_KBHIv1") %>%
+  select(-c("Total")) %>%
+  mutate("BUSCO \"genome\" completeness (v5.0; metazoa_odb10; 954 total genes)"="") %>%
+  relocate(last_col(), .before = "Complete") %>%
+  rename("GM--Complete (no.)" = "Complete") %>%
+  rename("GM--  Single-copy (no.)" = "Single-copy") %>%
+  rename("GM--  Duplicated (no.)" = "Duplicated") %>%
+  rename("GM--Fragmented (no.)" = "Fragmented") %>%
+  rename("GM--Missing (no.)" = "Missing")
+  
+t3 <- genome.eukaryota %>%
+  filter(SampleID!="Pocillopora_meandrina_KBHIv1") %>%
+  select(-c("Total")) %>%
+  mutate("BUSCO \"genome\" completeness (v5.0; eukaryota_odb10; 255 total genes)"="") %>%
+  relocate(last_col(), .before = "Complete") %>%
+  rename("GE--Complete (no.)" = "Complete") %>%
+  rename("GE--  Single-copy (no.)" = "Single-copy") %>%
+  rename("GE--  Duplicated (no.)" = "Duplicated") %>%
+  rename("GE--Fragmented (no.)" = "Fragmented") %>%
+  rename("GE--Missing (no.)" = "Missing")
+ 
+t4 <- genome.stats %>%
+  filter(SampleID!="Pocillopora_meandrina_KBHIv1") %>%
+  select("SampleID", 
+         "Number of protein-coding genes", 
+         "Average protein-coding gene length (CDS+introns; bp)",
+         "Average transcript (CDS) length (bp)",
+         "Average number of CDS per gene",
+         "Average CDS length (bp)",
+         "Number of single-CDS genes",
+         "Percent single-CDS genes",
+         "Average intron length (between CDS; bp)") %>%
+  mutate("Protein-coding genes"="") %>%
+  relocate(last_col(), .before = "Number of protein-coding genes") %>%
+  mutate("Protein-coding transcripts"="") %>%
+  relocate(last_col(), .before = "Average transcript (CDS) length (bp)") %>%
+  mutate("Single-CDS genes"="") %>%
+  relocate(last_col(), .before = "Number of single-CDS genes") %>%
+  mutate("Introns between CDS"="") %>%
+  relocate(last_col(), .before = "Average intron length (between CDS; bp)") %>%
+  mutate(across(c("Number of protein-coding genes", 
+                  "Average protein-coding gene length (CDS+introns; bp)",
+                  "Average transcript (CDS) length (bp)",
+                  "Average number of CDS per gene",
+                  "Average CDS length (bp)",
+                  "Number of single-CDS genes",
+                  "Average intron length (between CDS; bp)"), comma))
+
+t5 <- protein.metazoa %>%
+  filter(SampleID!="Pocillopora_meandrina_KBHIv1") %>%
+  select(-c("Total")) %>%
+  mutate("BUSCO \"protein\" completeness (v5.0; metazoa_odb10; 954 total genes)"="") %>%
+  relocate(last_col(), .before = "Complete") %>%
+  rename("PM--Complete (no.)" = "Complete") %>%
+  rename("PM--  Single-copy (no.)" = "Single-copy") %>%
+  rename("PM--  Duplicated (no.)" = "Duplicated") %>%
+  rename("PM--Fragmented (no.)" = "Fragmented") %>%
+  rename("PM--Missing (no.)" = "Missing")
+  
+t6 <- protein.eukaryota %>%
+  filter(SampleID!="Pocillopora_meandrina_KBHIv1") %>%
+  select(-c("Total")) %>%
+  mutate("BUSCO \"protein\" completeness (v5.0; eukaryota_odb10; 255 total genes)"="") %>%
+  relocate(last_col(), .before = "Complete") %>%
+  rename("PE--Complete (no.)" = "Complete") %>%
+  rename("PE--  Single-copy (no.)" = "Single-copy") %>%
+  rename("PE--  Duplicated (no.)" = "Duplicated") %>%
+  rename("PE--Fragmented (no.)" = "Fragmented") %>%
+  rename("PE--Missing (no.)" = "Missing")
+
+t <- merge(t1, t2, by="SampleID", sort=FALSE, no.dups=FALSE)
+t <- merge(t,  t3, by="SampleID", sort=FALSE, no.dups=FALSE)
+t <- merge(t,  t4, by="SampleID", sort=FALSE, no.dups=FALSE)
+t <- merge(t,  t5, by="SampleID", sort=FALSE, no.dups=FALSE)
+t <- merge(t,  t6, by="SampleID", sort=FALSE, no.dups=FALSE)
+t <- t %>%
+  t() %>%
+  as.data.frame() %>%
+  rownames_to_column() %>%
+  mutate(rowname = str_remove(rowname, "GM--")) %>%
+  mutate(rowname = str_remove(rowname, "GE--")) %>%
+  mutate(rowname = str_remove(rowname, "PM--")) %>%
+  mutate(rowname = str_remove(rowname, "PE--"))
+```
+
+
+```{r}
+write_xlsx(t, "all_genomes-Combined-results.xlsx")
+```
+
+
+
+
+
+# Session Info
+
+```{r ressionInfo}
+sessionInfo()
+```

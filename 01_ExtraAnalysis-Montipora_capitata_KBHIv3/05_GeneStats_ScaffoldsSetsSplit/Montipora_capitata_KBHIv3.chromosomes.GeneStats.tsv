@@ -1,0 +1,43 @@
+# Files
+Genome file	Montipora_capitata_KBHIv3.chromosomes.assembly.fasta
+GFF file	Montipora_capitata_KBHIv3.chromosomes.genes.gff3
+
+# Genome stats
+Total scaffold length (bp)	679698592
+Total contig length (bp)	679557592
+Number of scaffolds	14
+Number of contigs	1424
+N50 of scaffolds (bp)	48529999
+N50 of contigs (bp)	751122
+Percent gaps	0.021
+Percent GC	39.65
+
+# Gene stats (combined CDS+introns)
+Number of genes	47839
+Total gene length	344306550
+Average gene length (bp)	7197.19
+Gene percent GC	39.8
+
+# Transcript stats (based on CDS features)
+Average transcript length (bp)	1198.19
+Average number of CDS per gene/transcript	4.91252
+
+# CDS stats
+Number of CDS	235010
+Total CDS length (bp)	57320361
+Average CDS length (bp)	243.906
+Number of single-CDS transcripts	15836
+Percent single-CDS transcripts	33.1027
+CDS percent GC	44.24
+
+# Intron stats (predicted between CDS features)
+Number of introns	187171
+Total intron length (bp)	286986189
+Average intron length (bp)	1533.28
+Intron percent GC	38.92
+
+# Intergenic stats (predicted between genes built from CDS features)
+Number of intergenic regions	45535
+Total intergenic region length (bp)	337363538
+Average intergenic region length (bp)	7408.88
+Intergenic region percent GC	39.51

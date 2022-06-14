@@ -1,0 +1,13 @@
+=====================================================================
+Slurm config version 0.2
+Starting at Tue 03 May 2022 12:13:09 AM EDT
+Working directory is /scratch/timothy/projects/0032_Coral_genomes_analysis/03_Analysis/2022-01-27/01_Hawaiian_coral_genomes/04_Stats_Original_Montipora_capitata_Assembly
+=====================================================================
+
+[Tue 03 May 2022 12:13:10 AM EDT]      CMD: ./genome_stats Mcap.genome_assembly.fa Mcap.genes.cleaned.gff3 > Mcap.GeneStats.tsv
+
+=====================================================================
+Started: at Tue 03 May 2022 12:13:09 AM EDT
+Finished: at Tue 03 May 2022 12:13:35 AM EDT
+ExitStatus: 0
+=====================================================================
